@@ -7,6 +7,7 @@ import (
 	"net/rpc"
 	"os"
 	"os/exec"
+	"syscall"
 	"time"
 )
 
@@ -229,7 +230,7 @@ var procTimeout = time.Second
 func (iop ioPipe) closeProc() error {
 	result := make(chan error, 1)
 	go func() { _, err := iop.proc.Wait(); result <- err }()
-	if err := iop.proc.Signal(os.Interrupt); err != nil {
+	if err := iop.proc.Signal(os.Interrupt); err != nil && err != syscall.EWINDOWS {
 		return err
 	}
 	select {
